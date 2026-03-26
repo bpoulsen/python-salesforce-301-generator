@@ -42,7 +42,7 @@ python sitemap_to_csv.py [--master URL] [--output PATH] [--delay SECONDS]
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--master` | `https://community.sw.siemens.com/s/sitemap.xml` | Sitemap URL (index or single `urlset` XML) |
-| `--output` | `sitemap_urls.csv` | Output CSV path |
+| `--output` | `sitemap_urls_YYYY-MM-DD.csv` | Output CSV path (default includes **today’s** date) |
 | `--delay` | `0.5` | Seconds to wait between HTTP requests |
 | `--user-agent` | `sitemap-to-csv/1.0 (+https://github.com/bpoulsen/python-salesforce-301-generator)` | `User-Agent` header for all requests |
 | `--navigational-topics` | `navigational-topics.txt` next to `sitemap_to_csv.py` | One Salesforce topic **record ID** per line (see below) |
@@ -54,7 +54,7 @@ During **Step 3: Processing…**, the tool prints total rows extracted and writt
 ### Examples
 
 ```bash
-# Default Siemens community master sitemap → sitemap_urls.csv
+# Default Siemens community master sitemap → sitemap_urls_YYYY-MM-DD.csv
 python sitemap_to_csv.py
 
 # Custom master and output file

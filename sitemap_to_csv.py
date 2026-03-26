@@ -12,6 +12,7 @@ import sys
 import time
 import xml.etree.ElementTree as ET
 from collections import Counter
+from datetime import date
 from pathlib import Path
 from typing import Callable
 from urllib.parse import urlparse
@@ -21,7 +22,6 @@ import requests
 # --- Constants / Configuration ---
 
 DEFAULT_MASTER_URL = "https://community.sw.siemens.com/s/sitemap.xml"
-DEFAULT_OUTPUT_FILE = "sitemap_urls.csv"
 DEFAULT_DELAY = 0.5
 REQUEST_TIMEOUT = 30.0
 CSV_COLUMNS = [
@@ -39,6 +39,11 @@ DEFAULT_USER_AGENT = (
 )
 
 NAVIGATIONAL_TOPICS_FILENAME = "navigational-topics.txt"
+
+
+def default_output_filename() -> str:
+    """Default CSV name: sitemap_urls_YYYY-MM-DD.csv (run date)."""
+    return f"sitemap_urls_{date.today().isoformat()}.csv"
 
 
 def _file_extension_in_path(path_lower: str) -> bool:
@@ -339,10 +344,11 @@ def main() -> None:
         default=DEFAULT_MASTER_URL,
         help=f"Master sitemap URL (index or urlset). Default: {DEFAULT_MASTER_URL!r}",
     )
+    _default_output = default_output_filename()
     parser.add_argument(
         "--output",
-        default=DEFAULT_OUTPUT_FILE,
-        help=f"Output CSV path. Default: {DEFAULT_OUTPUT_FILE!r}",
+        default=_default_output,
+        help=f"Output CSV path. Default: {_default_output!r} (datestamp is the run date)",
     )
     parser.add_argument(
         "--delay",
@@ -388,9 +394,12 @@ def main() -> None:
         print(f"  Total extracted : {total_extracted}", flush=True)
         print(f"  Total written   : {len(deduped)}", flush=True)
         by_type = Counter(r["page_type"] for r in deduped)
+        nav_topic_count = sum(1 for r in deduped if r["notes"] == "navigational topic")
         print("  By page_type:", flush=True)
         for pt in sorted(by_type):
             print(f"    {pt}: {by_type[pt]}", flush=True)
+            if pt == "topic":
+                print(f"      navigational: {nav_topic_count}", flush=True)
 
         print(flush=True)
         print(f"Step 4: Writing to {args.output}...", flush=True)
